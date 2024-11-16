@@ -1,6 +1,7 @@
-import { Component, output } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { InvestmentInput } from '../investment-input.model';
+import { InvestmentService } from '../investment.service';
 
 @Component({
   selector: 'app-user-input',
@@ -10,19 +11,13 @@ import type { InvestmentInput } from '../investment-input.model';
   styleUrl: './user-input.component.css'
 })
 export class UserInputComponent {
-  calculate = output<InvestmentInput>();
-  enteredInitialInvestment = '0';
-  enteredAnnualInvestment = '0';
-  enteredExpectedReturn = '5';
-  enteredDuration = '10';
-
+  //investmentInputModel: InvestmentInput = { initialInvestment: 0, annualInvestment: 0, expectedReturn: 5, duration: 10 } as InvestmentInput;
+  investmentInputModel = signal<InvestmentInput>({ initialInvestment: 0, annualInvestment: 0, expectedReturn: 5, duration: 10 })
+  // calculate = output<InvestmentInput>();
+  private investmentService = inject(InvestmentService);
+  
   onSubmit() {
-    this.calculate.emit(
-      {
-        initialInvestment: +this.enteredInitialInvestment,
-        annualInvestment: +this.enteredAnnualInvestment,
-        expectedReturn: +this.enteredExpectedReturn,
-        duration: +this.enteredDuration
-      })
+    this.investmentService.calculateInvestmentResults(this.investmentInputModel());
+    this.investmentInputModel.set({ initialInvestment: 0, annualInvestment: 0, expectedReturn: 5, duration: 10 });
   }
 }
